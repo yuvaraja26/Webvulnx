@@ -1,11 +1,19 @@
 from app import db
 from app.models import VulnerabilityFinding
-from scanner.detectors import security_headers, information_disclosure, cookie_security
+from scanner.detectors import (
+    security_headers,
+    information_disclosure,
+    cookie_security,
+    cors_misconfiguration,
+    jwt_inspection,
+)
 
 PASSIVE_DETECTORS = [
     security_headers,
     information_disclosure,
     cookie_security,
+    cors_misconfiguration,
+    jwt_inspection,
 ]
 
 

@@ -7,6 +7,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 
 
 SEVERITY_ORDER = ["Critical", "High", "Medium", "Low", "Informational"]
+STATUS_ORDER = ["New", "Needs Validation", "Confirmed", "False Positive", "Fixed", "Retested"]
 
 
 def generate_pdf_report(assessment, target, findings, transaction_count: int) -> bytes:
@@ -72,7 +73,7 @@ def generate_pdf_report(assessment, target, findings, transaction_count: int) ->
         ["Assessment Status", assessment.status],
         ["HTTP Transactions Analysed", str(transaction_count)],
         ["Report Generated", now_str],
-        ["Report Version", "1.0"],
+        ["Report Version", "1.1"],
     ]
     meta_table = Table(meta_data, colWidths=[160, 340])
     meta_table.setStyle(
@@ -90,7 +91,7 @@ def generate_pdf_report(assessment, target, findings, transaction_count: int) ->
     story.append(meta_table)
     story.append(PageBreak())
 
-    # 2. Executive Summary & Risk Summary
+    # 2. Executive Summary
     story.append(Paragraph("1. Executive Summary", h1_style))
     story.append(
         Paragraph(
@@ -103,14 +104,21 @@ def generate_pdf_report(assessment, target, findings, transaction_count: int) ->
     )
     story.append(Spacer(1, 12))
 
-    # Severity counts table
-    counts = {sev: 0 for sev in SEVERITY_ORDER}
+    # 3. Severity Breakdown
+    sev_counts = {sev: 0 for sev in SEVERITY_ORDER}
+    status_counts = {st: 0 for st in STATUS_ORDER}
+    category_counts = {}
+
     for f in findings:
-        if f.severity in counts:
-            counts[f.severity] += 1
+        if f.severity in sev_counts:
+            sev_counts[f.severity] += 1
+        st = f.validation_status or "New"
+        status_counts[st] = status_counts.get(st, 0) + 1
+        cat = f.category or "Uncategorized"
+        category_counts[cat] = category_counts.get(cat, 0) + 1
 
     story.append(Paragraph("2. Vulnerability Summary by Severity", h1_style))
-    sev_rows = [["Severity", "Count"]] + [[sev, str(counts[sev])] for sev in SEVERITY_ORDER]
+    sev_rows = [["Severity", "Count"]] + [[sev, str(sev_counts[sev])] for sev in SEVERITY_ORDER]
     sev_table = Table(sev_rows, colWidths=[250, 250])
     sev_table.setStyle(
         TableStyle(
@@ -124,10 +132,52 @@ def generate_pdf_report(assessment, target, findings, transaction_count: int) ->
         )
     )
     story.append(sev_table)
+    story.append(Spacer(1, 12))
+
+    # 4. Validation Status Summary
+    story.append(Paragraph("3. Validation Status Summary", h1_style))
+    ordered_statuses = list(STATUS_ORDER) + [k for k in status_counts.keys() if k not in STATUS_ORDER]
+    status_rows = [["Validation Status", "Count"]] + [[st, str(status_counts.get(st, 0))] for st in ordered_statuses]
+    status_table = Table(status_rows, colWidths=[250, 250])
+    status_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1f2937")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
+                ("PADDING", (0, 0), (-1, -1), 7),
+            ]
+        )
+    )
+    story.append(status_table)
+    story.append(Spacer(1, 12))
+
+    # 5. Category Breakdown
+    story.append(Paragraph("4. Findings by Vulnerability Category", h1_style))
+    if category_counts:
+        cat_rows = [["Category", "Findings"]] + [
+            [cat, str(cnt)] for cat, cnt in sorted(category_counts.items(), key=lambda x: (-x[1], x[0]))
+        ]
+    else:
+        cat_rows = [["Category", "Findings"], ["None Recorded", "0"]]
+    cat_table = Table(cat_rows, colWidths=[350, 150])
+    cat_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#991b1b")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
+                ("PADDING", (0, 0), (-1, -1), 7),
+            ]
+        )
+    )
+    story.append(cat_table)
     story.append(Spacer(1, 14))
 
-    # 3. Scope & Methodology
-    story.append(Paragraph("3. Assessment Scope & Methodology", h1_style))
+    # 6. Scope & Methodology
+    story.append(Paragraph("5. Assessment Scope & Methodology", h1_style))
     story.append(
         Paragraph(
             f"Testing was strictly restricted to the authorized scope prefix <code>{target.scope_prefix}</code>. "
@@ -139,13 +189,13 @@ def generate_pdf_report(assessment, target, findings, transaction_count: int) ->
     )
     story.append(Spacer(1, 14))
 
-    # 4. Detailed Findings
-    story.append(Paragraph("4. Detailed Vulnerability Findings", h1_style))
+    # 7. Detailed Findings
+    story.append(Paragraph("6. Detailed Vulnerability Findings", h1_style))
     if not findings:
         story.append(Paragraph("No vulnerability findings were recorded for this assessment.", body_style))
     else:
         for idx, f in enumerate(findings, start=1):
-            story.append(Paragraph(f"4.{idx} [{f.severity}] {f.title}", h2_style))
+            story.append(Paragraph(f"6.{idx} [{f.severity}] {f.title}", h2_style))
             detail_rows = [
                 ["Affected Endpoint", f"{f.http_method} {f.affected_url}"],
                 ["Category", f.category],
@@ -170,10 +220,10 @@ def generate_pdf_report(assessment, target, findings, transaction_count: int) ->
             story.append(Paragraph(f"<b>Impact:</b> {_escape(f.impact or 'N/A')}", body_style))
             story.append(Paragraph(f"<b>Remediation:</b> {_escape(f.remediation)}", body_style))
             if f.response_evidence:
-                snippet = _escape(f.response_evidence[:800])
+                snippet = _escape(f.response_evidence[:800]).replace("\n", "<br/>")
                 story.append(Spacer(1, 4))
                 story.append(Paragraph("<b>Evidence Snippet:</b>", body_style))
-                story.append(Paragraph(snippet.replace("\n", "<br/>"), code_style))
+                story.append(Paragraph(snippet, code_style))
             story.append(Spacer(1, 12))
 
     doc.build(story)

@@ -1,138 +1,170 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Banner with SaaS Motion Reveal -->
-<div class="saas-card hero-banner p-4 mb-4 reveal-up">
-    <div class="row align-items-center">
+<!-- Command Hero Banner -->
+<div class="bento-card hero-command scanline-sweep p-4 p-lg-5 mb-4 motion-enter" style="animation-delay: 0.02s;">
+    <div class="row align-items-center g-4">
         <div class="col-lg-8">
-            <div class="text-crimson mono-text small fw-semibold mb-1">
-                AUTOMATED VAPT & BURP SUITE COMMUNITY INTEGRATION
+            <div class="d-inline-flex align-items-center gap-2 mono-text small text-crimson mb-2">
+                <i class="bi bi-terminal-fill"></i>
+                <span>BURP SUITE COMMUNITY + PYTHON ANALYSIS WORKBENCH</span>
             </div>
-            <h1 class="h3 fw-bold mb-2">WebVulnX Security Operations Telemetry</h1>
-            <p class="text-secondary mb-0">
-                Real-time HTTP inspection, controlled differential vulnerability analysis, manual finding validation, and CVSS v4.0 risk reporting restricted to authorized local targets.
+            <h1 class="display-6 fw-bold mb-2">WebVulnX Security Command Center</h1>
+            <p class="text-secondary mb-4" style="max-width: 66ch;">
+                Inspect sanitized HTTP traffic captured from Burp Suite Community Edition, run modular passive checks, validate findings manually, and export executive PDF and HTML VAPT reports.
             </p>
-        </div>
-        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-            {% if active_assessment %}
-            <div class="d-inline-block text-start p-3 rounded-3 bg-dark-subtle border border-danger border-opacity-25">
-                <div class="small text-secondary">ACTIVE ASSESSMENT</div>
-                <div class="fw-semibold text-light">{{ active_assessment.title }}</div>
-                <div class="mono-text small text-crimson mt-1">
-                    <i class="bi bi-check2-circle me-1"></i>Scope Locked: 127.0.0.1:3000
-                </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="btn btn-crimson-pro px-4 py-2">
+                    <i class="bi bi-shield-check me-2"></i>Review Findings
+                </a>
+                <a href="{{ url_for('reports.index') }}" class="btn btn-outline-light px-4 py-2" style="border-radius: 10px; border-color: rgba(255,255,255,0.16);">
+                    <i class="bi bi-download me-2"></i>Export VAPT Report
+                </a>
             </div>
-            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="p-4 rounded-4" style="background: rgba(5, 5, 8, 0.78); border: 1px solid rgba(255, 23, 68, 0.3);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="mono-text small text-uppercase text-secondary">Active Assessment</span>
+                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">LIVE</span>
+                </div>
+                {% if active_assessment %}
+                    <div class="fw-bold fs-6 text-light mb-2">{{ active_assessment.title }}</div>
+                    <div class="mono-text small text-crimson mb-1">
+                        <i class="bi bi-lock-fill me-1"></i>Scope: http://127.0.0.1:3000
+                    </div>
+                    <div class="small text-secondary">
+                        Started {{ active_assessment.started_at.strftime('%Y-%m-%d %H:%M UTC') }}
+                    </div>
+                {% else %}
+                    <div class="text-secondary small">No active assessment. Start one under Targets &amp; Scope.</div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Top KPI Row -->
+<!-- 4 Primary KPI Bento Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.05s;">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="text-secondary small text-uppercase fw-semibold">Authorized Targets</span>
-                <i class="bi bi-bullseye text-crimson fs-5"></i>
+    <div class="col-sm-6 col-xl-3">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.08s;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-secondary">Authorized Targets</div>
+                    <div class="small text-muted">Localhost Scope Locked</div>
+                </div>
+                <div class="kpi-icon-badge"><i class="bi bi-crosshair"></i></div>
             </div>
-            <div class="kpi-value mt-2 counter" data-target="{{ total_targets }}">{{ total_targets }}</div>
-            <div class="small text-secondary mt-1">Strict Localhost Scope Enforced</div>
+            <div class="kpi-num" data-countup="{{ total_targets }}">{{ total_targets }}</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.1s;">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="text-secondary small text-uppercase fw-semibold">Assessments</span>
-                <i class="bi bi-layers-fill text-crimson fs-5"></i>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.14s;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-secondary">Assessments</div>
+                    <div class="small text-muted">Active &amp; Historical Runs</div>
+                </div>
+                <div class="kpi-icon-badge"><i class="bi bi-layers-half"></i></div>
             </div>
-            <div class="kpi-value mt-2 counter" data-target="{{ total_assessments }}">{{ total_assessments }}</div>
-            <div class="small text-secondary mt-1">Historical & Active Runs</div>
+            <div class="kpi-num" data-countup="{{ total_assessments }}">{{ total_assessments }}</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.15s;">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="text-secondary small text-uppercase fw-semibold">HTTP Requests Analysed</span>
-                <i class="bi bi-hdd-network-fill text-crimson fs-5"></i>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.20s;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-secondary">HTTP Transactions</div>
+                    <div class="small text-muted">Ingested via Burp Bridge</div>
+                </div>
+                <div class="kpi-icon-badge"><i class="bi bi-arrow-left-right"></i></div>
             </div>
-            <div class="kpi-value mt-2 counter" data-target="{{ total_requests }}">{{ total_requests }}</div>
-            <div class="small text-secondary mt-1">Captured via Burp Extension</div>
+            <div class="kpi-num" data-countup="{{ total_requests }}">{{ total_requests }}</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.2s;">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="text-secondary small text-uppercase fw-semibold">Total Findings</span>
-                <i class="bi bi-shield-exclamation text-crimson fs-5"></i>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.26s;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-secondary">Total Findings</div>
+                    <div class="small text-muted">Passive &amp; Validated</div>
+                </div>
+                <div class="kpi-icon-badge"><i class="bi bi-exclamation-triangle-fill"></i></div>
             </div>
-            <div class="kpi-value mt-2 counter" data-target="{{ total_findings }}">{{ total_findings }}</div>
-            <div class="small text-secondary mt-1">Across All Severity Tiers</div>
+            <div class="kpi-num" data-countup="{{ total_findings }}">{{ total_findings }}</div>
         </div>
     </div>
 </div>
 
 <!-- Severity Breakdown Strip -->
+{% set tiers = [
+    ('Critical', severity_counts['Critical'], 'tier-critical', '#ff4569'),
+    ('High', severity_counts['High'], 'tier-high', '#fb923c'),
+    ('Medium', severity_counts['Medium'], 'tier-medium', '#fbbf24'),
+    ('Low', severity_counts['Low'], 'tier-low', '#34d399'),
+    ('Informational', severity_counts['Informational'], 'tier-info', '#38bdf8')
+] %}
 <div class="row g-3 mb-4">
-    {% set sev_meta = [
-        ('Critical', severity_counts['Critical'], 'sev-critical'),
-        ('High', severity_counts['High'], 'sev-high'),
-        ('Medium', severity_counts['Medium'], 'sev-medium'),
-        ('Low', severity_counts['Low'], 'sev-low'),
-        ('Informational', severity_counts['Informational'], 'sev-info')
-    ] %}
-    {% for label, count, css_class in sev_meta %}
-    <div class="col">
-        <div class="saas-card p-3 text-center severity-pill-card {{ css_class }} reveal-up">
-            <div class="small text-uppercase fw-bold opacity-75">{{ label }}</div>
-            <div class="h3 fw-bold my-1 mono-text">{{ count }}</div>
-            <div class="small opacity-50">Findings</div>
+    {% for label, val, cls, accent in tiers %}
+    <div class="col-6 col-md">
+        <div class="bento-card tier-card {{ cls }} motion-enter" style="animation-delay: {{ 0.28 + loop.index0 * 0.04 }}s;">
+            <div class="small fw-bold text-uppercase" style="color: {{ accent }}; letter-spacing: 0.08em;">{{ label }}</div>
+            <div class="tier-count" data-countup="{{ val }}">{{ val }}</div>
+            <div class="small text-muted">Findings</div>
         </div>
     </div>
     {% endfor %}
 </div>
 
-<!-- Chart.js Telemetry Visualizations -->
+<!-- Analytics Charts -->
 <div class="row g-4 mb-4">
     <div class="col-lg-5">
-        <div class="saas-card p-4 h-100 reveal-up">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.42s;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h6 fw-bold text-uppercase mb-0">
-                    <i class="bi bi-pie-chart-fill text-crimson me-2"></i>Severity Distribution
+                    <i class="bi bi-pie-chart-fill text-crimson me-2"></i>Severity Breakdown
                 </h2>
-                <span class="mono-text small text-secondary">CVSS v4.0 Tiers</span>
+                <span class="mono-text small text-muted">Risk Tiers</span>
             </div>
-            <div style="height: 260px;">
+            <div style="height: 265px;">
                 <canvas id="severityChart"></canvas>
             </div>
         </div>
     </div>
 
     <div class="col-lg-7">
-        <div class="saas-card p-4 h-100 reveal-up">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.48s;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h6 fw-bold text-uppercase mb-0">
-                    <i class="bi bi-bar-chart-fill text-crimson me-2"></i>Vulnerability Categories
+                    <i class="bi bi-bar-chart-line-fill text-crimson me-2"></i>Findings by Category
                 </h2>
-                <span class="mono-text small text-secondary">Detection Modules</span>
+                <span class="mono-text small text-muted">Detection Modules</span>
             </div>
-            <div style="height: 260px;">
+            <div style="height: 265px;">
                 <canvas id="categoryChart"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Assessments & Recent Findings Tables -->
+<!-- Recent Assessments & Findings -->
 <div class="row g-4">
-    <div class="col-lg-5" id="assessments-panel">
-        <div class="saas-card p-4 h-100 reveal-up">
-            <h2 class="h6 fw-bold text-uppercase mb-3">
-                <i class="bi bi-clock-history text-crimson me-2"></i>Recent Assessments
-            </h2>
+    <div class="col-lg-5">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.54s;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 fw-bold text-uppercase mb-0">
+                    <i class="bi bi-clock-history text-crimson me-2"></i>Recent Assessments
+                </h2>
+                <a href="{{ url_for('targets.list_targets') }}" class="small text-crimson text-decoration-none">Manage &rarr;</a>
+            </div>
             <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
+                <table class="table table-saas">
                     <thead>
-                        <tr class="text-secondary small">
+                        <tr>
                             <th>ID</th>
                             <th>Assessment</th>
                             <th>Status</th>
@@ -142,16 +174,14 @@
                     <tbody>
                         {% for item in recent_assessments %}
                         <tr>
-                            <td class="mono-text text-crimson">#{{ item.id }}</td>
-                            <td class="fw-semibold">{{ item.title }}</td>
+                            <td class="mono-text text-crimson fw-semibold">#{{ item.id }}</td>
+                            <td class="fw-medium">{{ item.title }}</td>
                             <td>
-                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger">
+                                <span class="badge rounded-pill {% if item.status == 'Active' %}bg-danger bg-opacity-25 text-danger border border-danger{% else %}bg-secondary bg-opacity-25 text-secondary{% endif %}">
                                     {{ item.status }}
                                 </span>
                             </td>
-                            <td class="mono-text small text-secondary">
-                                {{ item.started_at.strftime('%Y-%m-%d %H:%M') }}
-                            </td>
+                            <td class="mono-text small text-secondary">{{ item.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -160,41 +190,46 @@
         </div>
     </div>
 
-    <div class="col-lg-7" id="findings-panel">
-        <div class="saas-card p-4 h-100 reveal-up">
-            <h2 class="h6 fw-bold text-uppercase mb-3">
-                <i class="bi bi-bug text-crimson me-2"></i>Recent Vulnerability Findings
-            </h2>
+    <div class="col-lg-7">
+        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.60s;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 fw-bold text-uppercase mb-0">
+                    <i class="bi bi-bug-fill text-crimson me-2"></i>Recent Vulnerability Findings
+                </h2>
+                <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="small text-crimson text-decoration-none">All Findings &rarr;</a>
+            </div>
             {% if recent_findings %}
             <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
+                <table class="table table-saas">
                     <thead>
-                        <tr class="text-secondary small">
+                        <tr>
                             <th>Severity</th>
-                            <th>Vulnerability</th>
+                            <th>Finding</th>
                             <th>Endpoint</th>
-                            <th>Validation</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for f in recent_findings %}
                         <tr>
                             <td><span class="badge bg-danger">{{ f.severity }}</span></td>
-                            <td class="fw-semibold">{{ f.title }}</td>
-                            <td class="mono-text small text-secondary">{{ f.affected_url }}</td>
-                            <td><span class="badge bg-secondary">{{ f.validation_status }}</span></td>
+                            <td class="fw-medium">
+                                <a href="{{ url_for('vulnerabilities.detail', finding_id=f.id) }}" class="text-light text-decoration-none">
+                                    {{ f.title }}
+                                </a>
+                            </td>
+                            <td class="mono-text small text-secondary">{{ f.affected_url[:48] }}</td>
+                            <td><span class="badge bg-dark border border-secondary text-secondary">{{ f.validation_status }}</span></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
             {% else %}
-            <div class="empty-state text-center py-5">
-                <i class="bi bi-radar text-crimson display-6 d-block mb-2"></i>
-                <div class="fw-semibold">Awaiting Burp Suite Community Traffic</div>
-                <p class="text-secondary small mb-0">
-                    Send HTTP requests from Burp Suite or start an assessment scan against <code>http://127.0.0.1:3000</code>.
-                </p>
+            <div class="text-center py-5">
+                <i class="bi bi-radar text-crimson fs-1 d-block mb-2"></i>
+                <div class="fw-semibold">No findings recorded yet</div>
+                <p class="text-secondary small mb-0">Send traffic from Burp Suite and run passive analysis under Findings &amp; Validation.</p>
             </div>
             {% endif %}
         </div>
