@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="saas-card p-4 reveal-up">
+    <div class="mb-4">
+        <h2 class="h6 fw-bold text-uppercase mb-1">
+            <i class="bi bi-file-earmark-pdf-fill text-crimson me-2"></i>Automated VAPT Report Generation
+        </h2>
+        <div class="small text-secondary">Export executive-ready PDF and standalone HTML security assessment reports</div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+                <tr class="text-secondary small">
+                    <th>ID</th>
+                    <th>Assessment</th>
+                    <th>Target</th>
+                    <th>Requests</th>
+                    <th>Findings</th>
+                    <th>Export Report</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in assessments %}
+                <tr>
+                    <td class="mono-text text-crimson">#{{ item.assessment.id }}</td>
+                    <td class="fw-semibold">{{ item.assessment.title }}</td>
+                    <td class="mono-text small text-secondary">{{ item.target.base_url }}</td>
+                    <td class="mono-text">{{ item.tx_count }}</td>
+                    <td class="mono-text">{{ item.finding_count }}</td>
+                    <td class="d-flex gap-2">
+                        <a href="{{ url_for('reports.download_pdf', assessment_id=item.assessment.id) }}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                        </a>
+                        <a href="{{ url_for('reports.download_html', assessment_id=item.assessment.id) }}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-filetype-html me-1"></i> HTML
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# Local Database & Secrets
+webvulnx.db
+*.sqlite3
+.env
+
+# Burp Extension Build Artifacts
+burp_extension/target/
+burp_extension/.idea/
+*.iml
+
+# Temporary & Archive Files
+*.zip
+*.log
+.DS_Store

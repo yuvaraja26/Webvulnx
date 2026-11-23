@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Banner with SaaS Motion Reveal -->
+<div class="saas-card hero-banner p-4 mb-4 reveal-up">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <div class="text-crimson mono-text small fw-semibold mb-1">
+                AUTOMATED VAPT & BURP SUITE COMMUNITY INTEGRATION
+            </div>
+            <h1 class="h3 fw-bold mb-2">WebVulnX Security Operations Telemetry</h1>
+            <p class="text-secondary mb-0">
+                Real-time HTTP inspection, controlled differential vulnerability analysis, manual finding validation, and CVSS v4.0 risk reporting restricted to authorized local targets.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            {% if active_assessment %}
+            <div class="d-inline-block text-start p-3 rounded-3 bg-dark-subtle border border-danger border-opacity-25">
+                <div class="small text-secondary">ACTIVE ASSESSMENT</div>
+                <div class="fw-semibold text-light">{{ active_assessment.title }}</div>
+                <div class="mono-text small text-crimson mt-1">
+                    <i class="bi bi-check2-circle me-1"></i>Scope Locked: 127.0.0.1:3000
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Top KPI Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.05s;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-secondary small text-uppercase fw-semibold">Authorized Targets</span>
+                <i class="bi bi-bullseye text-crimson fs-5"></i>
+            </div>
+            <div class="kpi-value mt-2 counter" data-target="{{ total_targets }}">{{ total_targets }}</div>
+            <div class="small text-secondary mt-1">Strict Localhost Scope Enforced</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.1s;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-secondary small text-uppercase fw-semibold">Assessments</span>
+                <i class="bi bi-layers-fill text-crimson fs-5"></i>
+            </div>
+            <div class="kpi-value mt-2 counter" data-target="{{ total_assessments }}">{{ total_assessments }}</div>
+            <div class="small text-secondary mt-1">Historical & Active Runs</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.15s;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-secondary small text-uppercase fw-semibold">HTTP Requests Analysed</span>
+                <i class="bi bi-hdd-network-fill text-crimson fs-5"></i>
+            </div>
+            <div class="kpi-value mt-2 counter" data-target="{{ total_requests }}">{{ total_requests }}</div>
+            <div class="small text-secondary mt-1">Captured via Burp Extension</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="saas-card kpi-card p-3 reveal-up" style="animation-delay: 0.2s;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-secondary small text-uppercase fw-semibold">Total Findings</span>
+                <i class="bi bi-shield-exclamation text-crimson fs-5"></i>
+            </div>
+            <div class="kpi-value mt-2 counter" data-target="{{ total_findings }}">{{ total_findings }}</div>
+            <div class="small text-secondary mt-1">Across All Severity Tiers</div>
+        </div>
+    </div>
+</div>
+
+<!-- Severity Breakdown Strip -->
+<div class="row g-3 mb-4">
+    {% set sev_meta = [
+        ('Critical', severity_counts['Critical'], 'sev-critical'),
+        ('High', severity_counts['High'], 'sev-high'),
+        ('Medium', severity_counts['Medium'], 'sev-medium'),
+        ('Low', severity_counts['Low'], 'sev-low'),
+        ('Informational', severity_counts['Informational'], 'sev-info')
+    ] %}
+    {% for label, count, css_class in sev_meta %}
+    <div class="col">
+        <div class="saas-card p-3 text-center severity-pill-card {{ css_class }} reveal-up">
+            <div class="small text-uppercase fw-bold opacity-75">{{ label }}</div>
+            <div class="h3 fw-bold my-1 mono-text">{{ count }}</div>
+            <div class="small opacity-50">Findings</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Chart.js Telemetry Visualizations -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-5">
+        <div class="saas-card p-4 h-100 reveal-up">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 fw-bold text-uppercase mb-0">
+                    <i class="bi bi-pie-chart-fill text-crimson me-2"></i>Severity Distribution
+                </h2>
+                <span class="mono-text small text-secondary">CVSS v4.0 Tiers</span>
+            </div>
+            <div style="height: 260px;">
+                <canvas id="severityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="saas-card p-4 h-100 reveal-up">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 fw-bold text-uppercase mb-0">
+                    <i class="bi bi-bar-chart-fill text-crimson me-2"></i>Vulnerability Categories
+                </h2>
+                <span class="mono-text small text-secondary">Detection Modules</span>
+            </div>
+            <div style="height: 260px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Assessments & Recent Findings Tables -->
+<div class="row g-4">
+    <div class="col-lg-5" id="assessments-panel">
+        <div class="saas-card p-4 h-100 reveal-up">
+            <h2 class="h6 fw-bold text-uppercase mb-3">
+                <i class="bi bi-clock-history text-crimson me-2"></i>Recent Assessments
+            </h2>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-secondary small">
+                            <th>ID</th>
+                            <th>Assessment</th>
+                            <th>Status</th>
+                            <th>Started</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in recent_assessments %}
+                        <tr>
+                            <td class="mono-text text-crimson">#{{ item.id }}</td>
+                            <td class="fw-semibold">{{ item.title }}</td>
+                            <td>
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger">
+                                    {{ item.status }}
+                                </span>
+                            </td>
+                            <td class="mono-text small text-secondary">
+                                {{ item.started_at.strftime('%Y-%m-%d %H:%M') }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7" id="findings-panel">
+        <div class="saas-card p-4 h-100 reveal-up">
+            <h2 class="h6 fw-bold text-uppercase mb-3">
+                <i class="bi bi-bug text-crimson me-2"></i>Recent Vulnerability Findings
+            </h2>
+            {% if recent_findings %}
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-secondary small">
+                            <th>Severity</th>
+                            <th>Vulnerability</th>
+                            <th>Endpoint</th>
+                            <th>Validation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in recent_findings %}
+                        <tr>
+                            <td><span class="badge bg-danger">{{ f.severity }}</span></td>
+                            <td class="fw-semibold">{{ f.title }}</td>
+                            <td class="mono-text small text-secondary">{{ f.affected_url }}</td>
+                            <td><span class="badge bg-secondary">{{ f.validation_status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state text-center py-5">
+                <i class="bi bi-radar text-crimson display-6 d-block mb-2"></i>
+                <div class="fw-semibold">Awaiting Burp Suite Community Traffic</div>
+                <p class="text-secondary small mb-0">
+                    Send HTTP requests from Burp Suite or start an assessment scan against <code>http://127.0.0.1:3000</code>.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.WEBVULNX_TELEMETRY = {
+        severities: [
+            {{ severity_counts['Critical'] }},
+            {{ severity_counts['High'] }},
+            {{ severity_counts['Medium'] }},
+            {{ severity_counts['Low'] }},
+            {{ severity_counts['Informational'] }}
+        ],
+        categoryLabels: {{ category_labels | tojson }},
+        categoryCounts: {{ category_counts | tojson }}
+    };
+</script>
+{% endblock %}
