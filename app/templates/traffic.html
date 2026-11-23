@@ -1,52 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 motion-enter" style="animation-delay: 0.02s;">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 anim-rise" style="animation-delay: 0.02s;">
     <div>
-        <div class="mono-text small text-crimson mb-1">
-            <i class="bi bi-activity me-1"></i>BURP SUITE COMMUNITY STREAM
-        </div>
+        <div class="mono-text small text-crimson mb-1"><i class="bi bi-activity me-1"></i>BURP SUITE STREAM</div>
         <h1 class="h3 fw-bold mb-0">Captured HTTP Traffic</h1>
     </div>
     <div class="d-flex align-items-center gap-2">
-        <span class="pill-live">
-            <i class="bi bi-incognito"></i> CREDENTIALS REDACTED
-        </span>
-        <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="btn btn-crimson-pro btn-sm px-3 py-2">
+        <span class="status-pill-crimson"><i class="bi bi-incognito"></i> CREDENTIALS REDACTED</span>
+        <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="btn btn-cta-crimson btn-sm px-3 py-2">
             <i class="bi bi-radar me-1"></i>View Findings
         </a>
     </div>
 </div>
 
-<div class="bento-card p-4 motion-enter" style="animation-delay: 0.08s;">
+<div class="pro-card p-4 anim-rise" style="animation-delay: 0.08s;">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h6 fw-bold text-uppercase mb-0">
-            <i class="bi bi-arrow-left-right text-crimson me-2"></i>Ingested Transactions
-        </h2>
+        <h2 class="h6 fw-bold text-uppercase mb-0"><i class="bi bi-arrow-left-right text-crimson me-2"></i>Ingested Transactions</h2>
         <span class="mono-text small text-secondary">Total: {{ transactions|length }}</span>
     </div>
-
     <div class="table-responsive">
-        <table class="table table-saas">
+        <table class="table table-pro">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Method</th>
-                    <th>URL</th>
-                    <th>Status</th>
-                    <th>Content-Type</th>
-                    <th>Engine</th>
-                    <th>Captured</th>
-                </tr>
+                <tr><th>ID</th><th>Method</th><th>URL</th><th>Status</th><th>Content-Type</th><th>Engine</th><th>Captured</th></tr>
             </thead>
             <tbody>
                 {% for tx in transactions %}
                 <tr>
                     <td class="mono-text text-crimson fw-semibold">#{{ tx.id }}</td>
-                    <td>
-                        <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-40 mono-text">
-                            {{ tx.http_method }}
-                        </span>
-                    </td>
+                    <td><span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-40 mono-text">{{ tx.http_method }}</span></td>
                     <td class="mono-text small text-light" style="max-width: 420px; word-break: break-all;">{{ tx.url }}</td>
                     <td class="mono-text small">{{ tx.status_code or '-' }}</td>
                     <td class="mono-text small text-secondary">{{ tx.response_content_type or tx.request_content_type or '-' }}</td>
@@ -60,13 +41,7 @@
                     <td class="mono-text small text-secondary">{{ tx.created_at.strftime('%H:%M:%S') if tx.created_at else '-' }}</td>
                 </tr>
                 {% else %}
-                <tr>
-                    <td colspan="7" class="text-center text-secondary py-5">
-                        <i class="bi bi-broadcast text-crimson fs-2 d-block mb-2"></i>
-                        <div class="fw-semibold">No HTTP traffic ingested yet</div>
-                        <div class="small">Right-click a request in Burp Suite HTTP history &rarr; <strong>Extensions &rarr; WebVulnX Connector &rarr; Send to WebVulnX</strong>.</div>
-                    </td>
-                </tr>
+                <tr><td colspan="7" class="text-center text-secondary py-5">No HTTP traffic ingested yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

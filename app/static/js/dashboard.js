@@ -1,16 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-    initSpotlightCards();
-    initAnimatedCounters();
-    initNeuralMeshCanvas();
-    initTelemetryCharts();
+    bindCardSpotlights();
+    animateMetricCounters();
+    launchParticleField();
+    renderTelemetryCharts();
 });
 
-/**
- * Cursor-following radial crimson spotlight on Bento cards
- */
-function initSpotlightCards() {
-    const cards = document.querySelectorAll(".bento-card");
-    cards.forEach((card) => {
+function bindCardSpotlights() {
+    document.querySelectorAll(".pro-card").forEach((card) => {
         card.addEventListener("mousemove", (e) => {
             const rect = card.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -21,138 +17,121 @@ function initSpotlightCards() {
     });
 }
 
-/**
- * Smooth count-up animation for numeric KPIs and severity counters
- */
-function initAnimatedCounters() {
-    const counters = document.querySelectorAll("[data-countup]");
-    counters.forEach((el) => {
+function animateMetricCounters() {
+    document.querySelectorAll("[data-countup]").forEach((el) => {
         const target = parseInt(el.getAttribute("data-countup"), 10) || 0;
         if (target === 0) {
             el.textContent = "0";
             return;
         }
         const duration = 850;
-        const startTime = performance.now();
+        const start = performance.now();
 
-        function tick(now) {
-            const elapsed = now - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 4);
+        function step(now) {
+            const p = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 4);
             el.textContent = Math.round(eased * target).toString();
-            if (progress < 1) {
-                requestAnimationFrame(tick);
-            }
+            if (p < 1) requestAnimationFrame(step);
         }
-        requestAnimationFrame(tick);
+        requestAnimationFrame(step);
     });
 }
 
-/**
- * Subtle interactive red/black particle network with pointer attraction
- */
-function initNeuralMeshCanvas() {
+function launchParticleField() {
     const canvas = document.getElementById("cyberCanvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
     let w = (canvas.width = window.innerWidth);
     let h = (canvas.height = window.innerHeight);
-    const pointer = { x: null, y: null };
+    const mouse = { x: null, y: null };
 
     window.addEventListener("resize", () => {
         w = canvas.width = window.innerWidth;
         h = canvas.height = window.innerHeight;
     });
-
     window.addEventListener("mousemove", (e) => {
-        pointer.x = e.clientX;
-        pointer.y = e.clientY;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
     });
-
     window.addEventListener("mouseleave", () => {
-        pointer.x = null;
-        pointer.y = null;
+        mouse.x = null;
+        mouse.y = null;
     });
 
-    const count = Math.min(68, Math.floor((w * h) / 24000) + 28);
-    const nodes = Array.from({ length: count }, () => ({
+    const total = Math.min(72, Math.floor((w * h) / 23000) + 30);
+    const pts = Array.from({ length: total }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.38,
-        vy: (Math.random() - 0.5) * 0.38,
-        r: Math.random() * 1.7 + 0.7,
+        vx: (Math.random() - 0.5) * 0.36,
+        vy: (Math.random() - 0.5) * 0.36,
+        r: Math.random() * 1.75 + 0.7,
     }));
 
-    function frame() {
+    function draw() {
         ctx.clearRect(0, 0, w, h);
 
-        for (let i = 0; i < nodes.length; i++) {
-            const n = nodes[i];
-            n.x += n.vx;
-            n.y += n.vy;
+        for (let i = 0; i < pts.length; i++) {
+            const p = pts[i];
+            p.x += p.vx;
+            p.y += p.vy;
 
-            if (n.x < 0 || n.x > w) n.vx *= -1;
-            if (n.y < 0 || n.y > h) n.vy *= -1;
+            if (p.x < 0 || p.x > w) p.vx *= -1;
+            if (p.y < 0 || p.y > h) p.vy *= -1;
 
-            if (pointer.x !== null && pointer.y !== null) {
-                const dx = pointer.x - n.x;
-                const dy = pointer.y - n.y;
-                const dist = Math.hypot(dx, dy);
-                if (dist < 140 && dist > 1) {
-                    n.x += (dx / dist) * 0.35;
-                    n.y += (dy / dist) * 0.35;
+            if (mouse.x !== null && mouse.y !== null) {
+                const dx = mouse.x - p.x;
+                const dy = mouse.y - p.y;
+                const d = Math.hypot(dx, dy);
+                if (d < 145 && d > 1) {
+                    p.x += (dx / d) * 0.36;
+                    p.y += (dy / d) * 0.36;
                 }
             }
 
             ctx.beginPath();
-            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(255, 23, 68, 0.55)";
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 23, 68, 0.58)";
             ctx.fill();
 
-            for (let j = i + 1; j < nodes.length; j++) {
-                const m = nodes[j];
-                const d = Math.hypot(n.x - m.x, n.y - m.y);
-                if (d < 130) {
+            for (let j = i + 1; j < pts.length; j++) {
+                const q = pts[j];
+                const dist = Math.hypot(p.x - q.x, p.y - q.y);
+                if (dist < 135) {
                     ctx.beginPath();
-                    ctx.moveTo(n.x, n.y);
-                    ctx.lineTo(m.x, m.y);
-                    ctx.strokeStyle = `rgba(255, 23, 68, ${(1 - d / 130) * 0.14})`;
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(q.x, q.y);
+                    ctx.strokeStyle = `rgba(255, 23, 68, ${(1 - dist / 135) * 0.15})`;
                     ctx.lineWidth = 0.85;
                     ctx.stroke();
                 }
             }
         }
-        requestAnimationFrame(frame);
+        requestAnimationFrame(draw);
     }
-    frame();
+    draw();
 }
 
-/**
- * Chart.js charts with red/black SaaS styling
- */
-function initTelemetryCharts() {
-    const telemetry = window.WEBVULNX_TELEMETRY || {
+function renderTelemetryCharts() {
+    const data = window.WEBVULNX_TELEMETRY || {
         severities: [0, 0, 0, 0, 0],
         categoryLabels: ["Security Misconfiguration", "Information Disclosure", "Session Security"],
         categoryCounts: [0, 0, 0],
     };
 
-    const sevCanvas = document.getElementById("severityChart");
-    if (sevCanvas) {
-        const sum = telemetry.severities.reduce((a, b) => a + b, 0);
-        const series = sum > 0 ? telemetry.severities : [0, 0, 0, 0, 0];
-
-        new Chart(sevCanvas, {
+    const sevEl = document.getElementById("severityChart");
+    if (sevEl) {
+        const total = data.severities.reduce((a, b) => a + b, 0);
+        new Chart(sevEl, {
             type: "doughnut",
             data: {
                 labels: ["Critical", "High", "Medium", "Low", "Informational"],
                 datasets: [{
-                    data: sum > 0 ? series : [1, 1, 1, 1, 1],
+                    data: total > 0 ? data.severities : [1, 1, 1, 1, 1],
                     backgroundColor: ["#ff1744", "#f97316", "#f59e0b", "#10b981", "#38bdf8"],
-                    borderColor: "#09090d",
+                    borderColor: "#06060a",
                     borderWidth: 3,
-                    hoverOffset: 6,
+                    hoverOffset: 7,
                 }],
             },
             options: {
@@ -174,25 +153,25 @@ function initTelemetryCharts() {
         });
     }
 
-    const catCanvas = document.getElementById("categoryChart");
-    if (catCanvas) {
-        const ctx2d = catCanvas.getContext("2d");
-        const grad = ctx2d.createLinearGradient(0, 0, 0, 260);
-        grad.addColorStop(0, "rgba(255, 23, 68, 0.85)");
-        grad.addColorStop(1, "rgba(122, 4, 25, 0.22)");
+    const catEl = document.getElementById("categoryChart");
+    if (catEl) {
+        const ctx = catEl.getContext("2d");
+        const grad = ctx.createLinearGradient(0, 0, 0, 260);
+        grad.addColorStop(0, "rgba(255, 23, 68, 0.88)");
+        grad.addColorStop(1, "rgba(110, 4, 24, 0.22)");
 
-        new Chart(catCanvas, {
+        new Chart(catEl, {
             type: "bar",
             data: {
-                labels: telemetry.categoryLabels,
+                labels: data.categoryLabels,
                 datasets: [{
                     label: "Findings",
-                    data: telemetry.categoryCounts,
+                    data: data.categoryCounts,
                     backgroundColor: grad,
-                    borderColor: "#ff4569",
+                    borderColor: "#ff5277",
                     borderWidth: 1.5,
                     borderRadius: 8,
-                    maxBarThickness: 54,
+                    maxBarThickness: 56,
                 }],
             },
             options: {

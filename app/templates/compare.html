@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 anim-rise" style="animation-delay: 0.02s;">
+    <div>
+        <div class="mono-text small text-crimson mb-1"><i class="bi bi-layout-split me-1"></i>RUN DELTA ANALYSIS</div>
+        <h1 class="h3 fw-bold mb-0">Side-by-Side Assessment Comparison</h1>
+    </div>
+    <span class="status-pill-crimson"><i class="bi bi-arrow-left-right"></i> BASELINE VS CURRENT</span>
+</div>
+
+<div class="pro-card p-4 mb-4 anim-rise" style="animation-delay: 0.08s;">
+    <form method="GET" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label small text-secondary fw-semibold">Baseline Assessment</label>
+            <select name="baseline_id" class="form-select form-select-pro">
+                {% for a in assessments %}
+                <option value="{{ a.id }}" {% if a.id == baseline_id %}selected{% endif %}>#{{ a.id }} — {{ a.title }} ({{ a.status }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-5">
+            <label class="form-label small text-secondary fw-semibold">Comparison Assessment</label>
+            <select name="current_id" class="form-select form-select-pro">
+                {% for a in assessments %}
+                <option value="{{ a.id }}" {% if a.id == current_id %}selected{% endif %}>#{{ a.id }} — {{ a.title }} ({{ a.status }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-cta-crimson w-100 py-2"><i class="bi bi-intersect me-1"></i>Compare</button>
+        </div>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="pro-card sev-tier-card sev-critical anim-rise" style="animation-delay: 0.12s;">
+            <div class="small fw-bold text-uppercase text-danger" style="letter-spacing: 0.08em;">New Findings</div>
+            <div class="sev-tier-num" data-countup="{{ new_findings|length }}">{{ new_findings|length }}</div>
+            <div class="small text-muted">Added in Comparison Run</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="pro-card sev-tier-card sev-low anim-rise" style="animation-delay: 0.16s;">
+            <div class="small fw-bold text-uppercase text-success" style="letter-spacing: 0.08em;">Resolved / Absent</div>
+            <div class="sev-tier-num" data-countup="{{ resolved_findings|length }}">{{ resolved_findings|length }}</div>
+            <div class="small text-muted">Cleared vs Baseline</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="pro-card sev-tier-card sev-medium anim-rise" style="animation-delay: 0.20s;">
+            <div class="small fw-bold text-uppercase text-warning" style="letter-spacing: 0.08em;">Persisting Findings</div>
+            <div class="sev-tier-num" data-countup="{{ persisting_findings|length }}">{{ persisting_findings|length }}</div>
+            <div class="small text-muted">Present in Both Runs</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.24s;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="mono-text small text-secondary text-uppercase">Baseline Run</span>
+                <span class="badge bg-dark border border-secondary text-secondary">#{{ baseline_assessment.id if baseline_assessment else '-' }}</span>
+            </div>
+            <h2 class="h5 fw-bold mb-2">{{ baseline_assessment.title if baseline_assessment else 'N/A' }}</h2>
+            <div class="mono-text small text-secondary">Requests: <strong class="text-light">{{ baseline_tx_count }}</strong> | Status: <strong class="text-light">{{ baseline_assessment.status if baseline_assessment else '-' }}</strong></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.28s;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="mono-text small text-crimson text-uppercase">Comparison Run</span>
+                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger">#{{ current_assessment.id if current_assessment else '-' }}</span>
+            </div>
+            <h2 class="h5 fw-bold mb-2">{{ current_assessment.title if current_assessment else 'N/A' }}</h2>
+            <div class="mono-text small text-secondary">Requests: <strong class="text-light">{{ current_tx_count }}</strong> | Status: <strong class="text-light">{{ current_assessment.status if current_assessment else '-' }}</strong></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.32s;">
+            <h2 class="h6 fw-bold text-uppercase mb-3"><i class="bi bi-plus-octagon-fill text-danger me-2"></i>New ({{ new_findings|length }})</h2>
+            {% if new_findings %}
+            <div class="table-responsive">
+                <table class="table table-pro">
+                    <thead><tr><th>Severity</th><th>Finding</th><th>Endpoint</th></tr></thead>
+                    <tbody>
+                        {% for f in new_findings %}
+                        <tr>
+                            <td><span class="badge bg-danger">{{ f.severity }}</span></td>
+                            <td class="fw-medium">{{ f.title }}</td>
+                            <td class="mono-text small text-secondary" style="word-break: break-all;">{{ f.affected_url }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-secondary small py-4 text-center">No new findings in this run.</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.36s;">
+            <h2 class="h6 fw-bold text-uppercase mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i>Resolved / Absent ({{ resolved_findings|length }})</h2>
+            {% if resolved_findings %}
+            <div class="table-responsive">
+                <table class="table table-pro">
+                    <thead><tr><th>Severity</th><th>Finding</th><th>Endpoint</th></tr></thead>
+                    <tbody>
+                        {% for f in resolved_findings %}
+                        <tr>
+                            <td><span class="badge bg-success bg-opacity-25 text-success border border-success">{{ f.severity }}</span></td>
+                            <td class="fw-medium">{{ f.title }}</td>
+                            <td class="mono-text small text-secondary" style="word-break: break-all;">{{ f.affected_url }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-secondary small py-4 text-center">No baseline findings cleared between runs.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="pro-card p-4 anim-rise" style="animation-delay: 0.40s;">
+    <h2 class="h6 fw-bold text-uppercase mb-3"><i class="bi bi-layers-fill text-warning me-2"></i>Persisting Findings ({{ persisting_findings|length }})</h2>
+    {% if persisting_findings %}
+    <div class="table-responsive">
+        <table class="table table-pro">
+            <thead><tr><th>Severity</th><th>Finding</th><th>Endpoint</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for f in persisting_findings %}
+                <tr>
+                    <td><span class="badge bg-danger">{{ f.severity }}</span></td>
+                    <td class="fw-medium">{{ f.title }}</td>
+                    <td class="mono-text small text-secondary" style="word-break: break-all;">{{ f.affected_url }}</td>
+                    <td><span class="badge bg-dark border border-secondary text-light">{{ f.validation_status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-secondary small py-3 text-center">No overlapping findings across selected runs.</div>
+    {% endif %}
+</div>
+{% endblock %}

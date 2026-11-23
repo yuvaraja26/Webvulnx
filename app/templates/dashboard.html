@@ -1,33 +1,30 @@
 {% extends "base.html" %}
-
 {% block content %}
-<!-- Command Hero Banner -->
-<div class="bento-card hero-command scanline-sweep p-4 p-lg-5 mb-4 motion-enter" style="animation-delay: 0.02s;">
+<div class="pro-card command-hero hero-shimmer p-4 p-lg-5 mb-4 anim-rise" style="animation-delay: 0.02s;">
     <div class="row align-items-center g-4">
         <div class="col-lg-8">
             <div class="d-inline-flex align-items-center gap-2 mono-text small text-crimson mb-2">
                 <i class="bi bi-terminal-fill"></i>
-                <span>BURP SUITE COMMUNITY + PYTHON ANALYSIS WORKBENCH</span>
+                <span>BURP SUITE COMMUNITY + MODULAR PASSIVE ENGINE</span>
             </div>
-            <h1 class="display-6 fw-bold mb-2">WebVulnX Security Command Center</h1>
+            <h1 class="display-6 fw-bold mb-2">WebVulnX Security Operations Telemetry</h1>
             <p class="text-secondary mb-4" style="max-width: 66ch;">
-                Inspect sanitized HTTP traffic captured from Burp Suite Community Edition, run modular passive checks, validate findings manually, and export executive PDF and HTML VAPT reports.
+                Captured HTTP traffic triage, passive security checks, analyst finding validation, run-to-run diffing, and executive PDF/HTML reporting isolated to authorized local targets.
             </p>
             <div class="d-flex flex-wrap gap-2">
-                <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="btn btn-crimson-pro px-4 py-2">
-                    <i class="bi bi-shield-check me-2"></i>Review Findings
+                <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="btn btn-cta-crimson px-4 py-2">
+                    <i class="bi bi-shield-check me-2"></i>Triage Findings
                 </a>
-                <a href="{{ url_for('reports.index') }}" class="btn btn-outline-light px-4 py-2" style="border-radius: 10px; border-color: rgba(255,255,255,0.16);">
-                    <i class="bi bi-download me-2"></i>Export VAPT Report
+                <a href="{{ url_for('compare.index') }}" class="btn btn-outline-light px-4 py-2" style="border-radius: 11px; border-color: rgba(255,255,255,0.16);">
+                    <i class="bi bi-layout-split me-2"></i>Compare Runs
                 </a>
             </div>
         </div>
-
         <div class="col-lg-4">
-            <div class="p-4 rounded-4" style="background: rgba(5, 5, 8, 0.78); border: 1px solid rgba(255, 23, 68, 0.3);">
+            <div class="p-4 rounded-4" style="background: rgba(5, 5, 9, 0.82); border: 1px solid rgba(255, 23, 68, 0.34);">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="mono-text small text-uppercase text-secondary">Active Assessment</span>
-                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">LIVE</span>
+                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">ACTIVE</span>
                 </div>
                 {% if active_assessment %}
                     <div class="fw-bold fs-6 text-light mb-2">{{ active_assessment.title }}</div>
@@ -38,95 +35,89 @@
                         Started {{ active_assessment.started_at.strftime('%Y-%m-%d %H:%M UTC') }}
                     </div>
                 {% else %}
-                    <div class="text-secondary small">No active assessment. Start one under Targets &amp; Scope.</div>
+                    <div class="text-secondary small">No active assessment configured.</div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<!-- 4 Primary KPI Bento Cards -->
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.08s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.08s;">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                     <div class="small text-uppercase fw-semibold text-secondary">Authorized Targets</div>
                     <div class="small text-muted">Localhost Scope Locked</div>
                 </div>
-                <div class="kpi-icon-badge"><i class="bi bi-crosshair"></i></div>
+                <div class="metric-icon"><i class="bi bi-crosshair"></i></div>
             </div>
-            <div class="kpi-num" data-countup="{{ total_targets }}">{{ total_targets }}</div>
+            <div class="metric-value" data-countup="{{ total_targets }}">{{ total_targets }}</div>
         </div>
     </div>
-
     <div class="col-sm-6 col-xl-3">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.14s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.14s;">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                     <div class="small text-uppercase fw-semibold text-secondary">Assessments</div>
                     <div class="small text-muted">Active &amp; Historical Runs</div>
                 </div>
-                <div class="kpi-icon-badge"><i class="bi bi-layers-half"></i></div>
+                <div class="metric-icon"><i class="bi bi-layers-half"></i></div>
             </div>
-            <div class="kpi-num" data-countup="{{ total_assessments }}">{{ total_assessments }}</div>
+            <div class="metric-value" data-countup="{{ total_assessments }}">{{ total_assessments }}</div>
         </div>
     </div>
-
     <div class="col-sm-6 col-xl-3">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.20s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.20s;">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                    <div class="small text-uppercase fw-semibold text-secondary">HTTP Transactions</div>
-                    <div class="small text-muted">Ingested via Burp Bridge</div>
+                    <div class="small text-uppercase fw-semibold text-secondary">HTTP Requests Analysed</div>
+                    <div class="small text-muted">Captured via Burp Extension</div>
                 </div>
-                <div class="kpi-icon-badge"><i class="bi bi-arrow-left-right"></i></div>
+                <div class="metric-icon"><i class="bi bi-arrow-left-right"></i></div>
             </div>
-            <div class="kpi-num" data-countup="{{ total_requests }}">{{ total_requests }}</div>
+            <div class="metric-value" data-countup="{{ total_requests }}">{{ total_requests }}</div>
         </div>
     </div>
-
     <div class="col-sm-6 col-xl-3">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.26s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.26s;">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                     <div class="small text-uppercase fw-semibold text-secondary">Total Findings</div>
-                    <div class="small text-muted">Passive &amp; Validated</div>
+                    <div class="small text-muted">Across All Severity Tiers</div>
                 </div>
-                <div class="kpi-icon-badge"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div class="metric-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             </div>
-            <div class="kpi-num" data-countup="{{ total_findings }}">{{ total_findings }}</div>
+            <div class="metric-value" data-countup="{{ total_findings }}">{{ total_findings }}</div>
         </div>
     </div>
 </div>
 
-<!-- Severity Breakdown Strip -->
 {% set tiers = [
-    ('Critical', severity_counts['Critical'], 'tier-critical', '#ff4569'),
-    ('High', severity_counts['High'], 'tier-high', '#fb923c'),
-    ('Medium', severity_counts['Medium'], 'tier-medium', '#fbbf24'),
-    ('Low', severity_counts['Low'], 'tier-low', '#34d399'),
-    ('Informational', severity_counts['Informational'], 'tier-info', '#38bdf8')
+    ('Critical', severity_counts['Critical'], 'sev-critical', '#ff5277'),
+    ('High', severity_counts['High'], 'sev-high', '#fb923c'),
+    ('Medium', severity_counts['Medium'], 'sev-medium', '#fbbf24'),
+    ('Low', severity_counts['Low'], 'sev-low', '#34d399'),
+    ('Informational', severity_counts['Informational'], 'sev-info', '#38bdf8')
 ] %}
 <div class="row g-3 mb-4">
     {% for label, val, cls, accent in tiers %}
     <div class="col-6 col-md">
-        <div class="bento-card tier-card {{ cls }} motion-enter" style="animation-delay: {{ 0.28 + loop.index0 * 0.04 }}s;">
+        <div class="pro-card sev-tier-card {{ cls }} anim-rise" style="animation-delay: {{ 0.28 + loop.index0 * 0.04 }}s;">
             <div class="small fw-bold text-uppercase" style="color: {{ accent }}; letter-spacing: 0.08em;">{{ label }}</div>
-            <div class="tier-count" data-countup="{{ val }}">{{ val }}</div>
+            <div class="sev-tier-num" data-countup="{{ val }}">{{ val }}</div>
             <div class="small text-muted">Findings</div>
         </div>
     </div>
     {% endfor %}
 </div>
 
-<!-- Analytics Charts -->
 <div class="row g-4 mb-4">
     <div class="col-lg-5">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.42s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.42s;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h6 fw-bold text-uppercase mb-0">
-                    <i class="bi bi-pie-chart-fill text-crimson me-2"></i>Severity Breakdown
+                    <i class="bi bi-pie-chart-fill text-crimson me-2"></i>Severity Distribution
                 </h2>
                 <span class="mono-text small text-muted">Risk Tiers</span>
             </div>
@@ -135,12 +126,11 @@
             </div>
         </div>
     </div>
-
     <div class="col-lg-7">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.48s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.48s;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h6 fw-bold text-uppercase mb-0">
-                    <i class="bi bi-bar-chart-line-fill text-crimson me-2"></i>Findings by Category
+                    <i class="bi bi-bar-chart-line-fill text-crimson me-2"></i>Vulnerability Categories
                 </h2>
                 <span class="mono-text small text-muted">Detection Modules</span>
             </div>
@@ -151,10 +141,9 @@
     </div>
 </div>
 
-<!-- Recent Assessments & Findings -->
 <div class="row g-4">
     <div class="col-lg-5">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.54s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.54s;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h6 fw-bold text-uppercase mb-0">
                     <i class="bi bi-clock-history text-crimson me-2"></i>Recent Assessments
@@ -162,14 +151,9 @@
                 <a href="{{ url_for('targets.list_targets') }}" class="small text-crimson text-decoration-none">Manage &rarr;</a>
             </div>
             <div class="table-responsive">
-                <table class="table table-saas">
+                <table class="table table-pro">
                     <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Assessment</th>
-                            <th>Status</th>
-                            <th>Started</th>
-                        </tr>
+                        <tr><th>ID</th><th>Assessment</th><th>Status</th><th>Started</th></tr>
                     </thead>
                     <tbody>
                         {% for item in recent_assessments %}
@@ -189,34 +173,26 @@
             </div>
         </div>
     </div>
-
     <div class="col-lg-7">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.60s;">
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.60s;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h6 fw-bold text-uppercase mb-0">
-                    <i class="bi bi-bug-fill text-crimson me-2"></i>Recent Vulnerability Findings
+                    <i class="bi bi-bug-fill text-crimson me-2"></i>Recent Findings
                 </h2>
                 <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="small text-crimson text-decoration-none">All Findings &rarr;</a>
             </div>
             {% if recent_findings %}
             <div class="table-responsive">
-                <table class="table table-saas">
+                <table class="table table-pro">
                     <thead>
-                        <tr>
-                            <th>Severity</th>
-                            <th>Finding</th>
-                            <th>Endpoint</th>
-                            <th>Status</th>
-                        </tr>
+                        <tr><th>Severity</th><th>Finding</th><th>Endpoint</th><th>Status</th></tr>
                     </thead>
                     <tbody>
                         {% for f in recent_findings %}
                         <tr>
                             <td><span class="badge bg-danger">{{ f.severity }}</span></td>
                             <td class="fw-medium">
-                                <a href="{{ url_for('vulnerabilities.detail', finding_id=f.id) }}" class="text-light text-decoration-none">
-                                    {{ f.title }}
-                                </a>
+                                <a href="{{ url_for('vulnerabilities.detail', finding_id=f.id) }}" class="text-light text-decoration-none">{{ f.title }}</a>
                             </td>
                             <td class="mono-text small text-secondary">{{ f.affected_url[:48] }}</td>
                             <td><span class="badge bg-dark border border-secondary text-secondary">{{ f.validation_status }}</span></td>
@@ -229,7 +205,7 @@
             <div class="text-center py-5">
                 <i class="bi bi-radar text-crimson fs-1 d-block mb-2"></i>
                 <div class="fw-semibold">No findings recorded yet</div>
-                <p class="text-secondary small mb-0">Send traffic from Burp Suite and run passive analysis under Findings &amp; Validation.</p>
+                <p class="text-secondary small mb-0">Send traffic from Burp Suite and run passive analysis.</p>
             </div>
             {% endif %}
         </div>

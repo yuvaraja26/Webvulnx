@@ -18,6 +18,7 @@ def create_app(config_class=Config):
     from app.routes.traffic import traffic_bp
     from app.routes.vulnerabilities import vulnerabilities_bp
     from app.routes.reports import reports_bp
+    from app.routes.compare import compare_bp
 
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(api_bp, url_prefix="/api/v1")
@@ -25,6 +26,7 @@ def create_app(config_class=Config):
     app.register_blueprint(traffic_bp)
     app.register_blueprint(vulnerabilities_bp)
     app.register_blueprint(reports_bp)
+    app.register_blueprint(compare_bp)
 
     with app.app_context():
         db.create_all()

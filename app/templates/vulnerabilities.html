@@ -1,24 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 motion-enter" style="animation-delay: 0.02s;">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 anim-rise" style="animation-delay: 0.02s;">
     <div>
-        <div class="mono-text small text-crimson mb-1">
-            <i class="bi bi-bug-fill me-1"></i>DETECTION ENGINE &amp; ANALYST TRIAGE
-        </div>
+        <div class="mono-text small text-crimson mb-1"><i class="bi bi-bug-fill me-1"></i>PASSIVE ENGINE &amp; TRIAGE</div>
         <h1 class="h3 fw-bold mb-0">Vulnerability Findings</h1>
     </div>
     <form method="POST" action="{{ url_for('vulnerabilities.scan_all_traffic') }}">
-        <button type="submit" class="btn btn-crimson-pro px-4 py-2">
+        <button type="submit" class="btn btn-cta-crimson px-4 py-2">
             <i class="bi bi-radar me-2"></i>Analyze All Captured Traffic
         </button>
     </form>
 </div>
 
-<div class="bento-card p-4 mb-4 motion-enter" style="animation-delay: 0.08s;">
+<div class="pro-card p-4 mb-4 anim-rise" style="animation-delay: 0.08s;">
     <form method="GET" class="row g-3 align-items-end">
         <div class="col-md-4">
-            <label class="form-label small text-secondary fw-semibold">Filter by Severity</label>
-            <select name="severity" class="form-select bg-dark text-light border-secondary border-opacity-50">
+            <label class="form-label small text-secondary fw-semibold">Severity</label>
+            <select name="severity" class="form-select form-select-pro">
                 <option value="">All Severities</option>
                 {% for sev in ['Critical', 'High', 'Medium', 'Low', 'Informational'] %}
                 <option value="{{ sev }}" {% if severity_filter == sev %}selected{% endif %}>{{ sev }}</option>
@@ -26,8 +24,8 @@
             </select>
         </div>
         <div class="col-md-4">
-            <label class="form-label small text-secondary fw-semibold">Filter by Validation Status</label>
-            <select name="status" class="form-select bg-dark text-light border-secondary border-opacity-50">
+            <label class="form-label small text-secondary fw-semibold">Validation Status</label>
+            <select name="status" class="form-select form-select-pro">
                 <option value="">All Validation Statuses</option>
                 {% for st in valid_statuses %}
                 <option value="{{ st }}" {% if status_filter == st %}selected{% endif %}>{{ st }}</option>
@@ -35,27 +33,17 @@
             </select>
         </div>
         <div class="col-md-4 d-flex gap-2">
-            <button type="submit" class="btn btn-crimson-pro flex-grow-1 py-2">
-                <i class="bi bi-funnel-fill me-1"></i>Apply Filters
-            </button>
+            <button type="submit" class="btn btn-cta-crimson flex-grow-1 py-2"><i class="bi bi-funnel-fill me-1"></i>Filter</button>
             <a href="{{ url_for('vulnerabilities.list_vulnerabilities') }}" class="btn btn-outline-secondary py-2">Reset</a>
         </div>
     </form>
 </div>
 
-<div class="bento-card p-4 motion-enter" style="animation-delay: 0.14s;">
+<div class="pro-card p-4 anim-rise" style="animation-delay: 0.14s;">
     <div class="table-responsive">
-        <table class="table table-saas">
+        <table class="table table-pro">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Severity</th>
-                    <th>Finding</th>
-                    <th>Endpoint</th>
-                    <th>Confidence</th>
-                    <th>Validation</th>
-                    <th>Action</th>
-                </tr>
+                <tr><th>ID</th><th>Severity</th><th>Finding</th><th>Endpoint</th><th>Confidence</th><th>Validation</th><th>Action</th></tr>
             </thead>
             <tbody>
                 {% for f in findings %}
@@ -65,25 +53,11 @@
                     <td class="fw-semibold">{{ f.title }}</td>
                     <td class="mono-text small text-secondary" style="max-width: 320px; word-break: break-all;">{{ f.affected_url }}</td>
                     <td class="small text-secondary">{{ f.confidence }}</td>
-                    <td>
-                        <span class="badge rounded-pill bg-dark border border-secondary text-light">
-                            {{ f.validation_status }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{{ url_for('vulnerabilities.detail', finding_id=f.id) }}" class="btn btn-sm btn-outline-danger">
-                            Inspect &rarr;
-                        </a>
-                    </td>
+                    <td><span class="badge rounded-pill bg-dark border border-secondary text-light">{{ f.validation_status }}</span></td>
+                    <td><a href="{{ url_for('vulnerabilities.detail', finding_id=f.id) }}" class="btn btn-sm btn-outline-danger">Inspect &rarr;</a></td>
                 </tr>
                 {% else %}
-                <tr>
-                    <td colspan="7" class="text-center text-secondary py-5">
-                        <i class="bi bi-shield-exclamation text-crimson fs-2 d-block mb-2"></i>
-                        <div class="fw-semibold">No findings match the current view</div>
-                        <div class="small">Capture traffic from Burp Suite or click <strong>Analyze All Captured Traffic</strong>.</div>
-                    </td>
-                </tr>
+                <tr><td colspan="7" class="text-center text-secondary py-5">No findings match the current filter.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

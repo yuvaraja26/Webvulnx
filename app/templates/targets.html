@@ -1,124 +1,83 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 motion-enter" style="animation-delay: 0.02s;">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 anim-rise" style="animation-delay: 0.02s;">
     <div>
-        <div class="mono-text small text-crimson mb-1">
-            <i class="bi bi-crosshair me-1"></i>SCOPE GOVERNANCE &amp; ASSESSMENT RUNS
-        </div>
+        <div class="mono-text small text-crimson mb-1"><i class="bi bi-crosshair me-1"></i>SCOPE GOVERNANCE</div>
         <h1 class="h3 fw-bold mb-0">Authorized Targets &amp; Assessments</h1>
     </div>
-    <span class="pill-live">
-        <i class="bi bi-shield-lock-fill"></i> LOCALHOST SCOPE ENFORCED
-    </span>
+    <span class="status-pill-crimson"><i class="bi bi-shield-lock-fill"></i> LOCALHOST SCOPE LOCKED</span>
 </div>
 
 <div class="row g-4">
     <div class="col-lg-5">
-        <div class="bento-card p-4 h-100 motion-enter" style="animation-delay: 0.08s;">
-            <h2 class="h6 fw-bold text-uppercase mb-3">
-                <i class="bi bi-plus-circle-fill text-crimson me-2"></i>Register Localhost Target
-            </h2>
-            <p class="small text-secondary mb-4">
-                Only local lab URLs (<code>127.0.0.1</code> or <code>localhost</code>) are permitted to keep assessments strictly isolated.
-            </p>
+        <div class="pro-card p-4 h-100 anim-rise" style="animation-delay: 0.08s;">
+            <h2 class="h6 fw-bold text-uppercase mb-3"><i class="bi bi-plus-circle-fill text-crimson me-2"></i>Register Localhost Target</h2>
+            <p class="small text-secondary mb-4">Restricted to local lab URLs (<code>127.0.0.1</code> or <code>localhost</code>).</p>
             <form method="POST">
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-semibold">Target Name</label>
-                    <input type="text" name="name" class="form-control bg-dark text-light border-secondary border-opacity-50" placeholder="OWASP Juice Shop (:3000)" required>
+                    <input type="text" name="name" class="form-control form-control-pro" placeholder="OWASP Juice Shop (:3000)" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-semibold">Base URL</label>
-                    <input type="text" name="base_url" class="form-control bg-dark text-light border-secondary border-opacity-50 mono-text" placeholder="http://127.0.0.1:3000" required>
+                    <input type="text" name="base_url" class="form-control form-control-pro mono-text" placeholder="http://127.0.0.1:3000" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-semibold">Scope Prefix</label>
-                    <input type="text" name="scope_prefix" class="form-control bg-dark text-light border-secondary border-opacity-50 mono-text" placeholder="http://127.0.0.1:3000" required>
+                    <input type="text" name="scope_prefix" class="form-control form-control-pro mono-text" placeholder="http://127.0.0.1:3000" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-semibold">Environment</label>
-                    <input type="text" name="environment" class="form-control bg-dark text-light border-secondary border-opacity-50" value="Kali Linux Local Docker Container">
+                    <input type="text" name="environment" class="form-control form-control-pro" value="Kali Linux Local Docker Container">
                 </div>
                 <div class="mb-4">
                     <label class="form-label small text-secondary fw-semibold">Notes</label>
-                    <textarea name="description" rows="2" class="form-control bg-dark text-light border-secondary border-opacity-50" placeholder="Authorized local VAPT target notes..."></textarea>
+                    <textarea name="description" rows="2" class="form-control form-control-pro" placeholder="Local lab notes..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-crimson-pro w-100 py-2">
-                    <i class="bi bi-check2-circle me-1"></i> Add Authorized Target
+                <button type="submit" class="btn btn-cta-crimson w-100 py-2">
+                    <i class="bi bi-check2-circle me-1"></i>Add Authorized Target
                 </button>
             </form>
         </div>
     </div>
 
     <div class="col-lg-7">
-        <div class="bento-card p-4 mb-4 motion-enter" style="animation-delay: 0.14s;">
-            <h2 class="h6 fw-bold text-uppercase mb-3">
-                <i class="bi bi-hdd-network-fill text-crimson me-2"></i>Registered Scope Targets
-            </h2>
+        <div class="pro-card p-4 mb-4 anim-rise" style="animation-delay: 0.14s;">
+            <h2 class="h6 fw-bold text-uppercase mb-3"><i class="bi bi-hdd-network-fill text-crimson me-2"></i>Registered Scope Targets</h2>
             <div class="table-responsive">
-                <table class="table table-saas">
-                    <thead>
-                        <tr>
-                            <th>Target</th>
-                            <th>Base URL</th>
-                            <th>Scope Prefix</th>
-                            <th>State</th>
-                        </tr>
-                    </thead>
+                <table class="table table-pro">
+                    <thead><tr><th>Target</th><th>Base URL</th><th>Scope Prefix</th><th>State</th></tr></thead>
                     <tbody>
                         {% for t in targets %}
                         <tr>
-                            <td class="fw-semibold">
-                                {{ t.name }}
-                                <div class="small text-secondary fw-normal">{{ t.environment }}</div>
-                            </td>
+                            <td class="fw-semibold">{{ t.name }}<div class="small text-secondary fw-normal">{{ t.environment }}</div></td>
                             <td class="mono-text small text-crimson">{{ t.base_url }}</td>
                             <td class="mono-text small text-secondary">{{ t.scope_prefix }}</td>
-                            <td>
-                                <span class="badge rounded-pill bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">
-                                    Authorized
-                                </span>
-                            </td>
+                            <td><span class="badge rounded-pill bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">Authorized</span></td>
                         </tr>
                         {% else %}
-                        <tr>
-                            <td colspan="4" class="text-center text-secondary py-4">No targets registered yet.</td>
-                        </tr>
+                        <tr><td colspan="4" class="text-center text-secondary py-4">No targets registered yet.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="bento-card p-4 motion-enter" style="animation-delay: 0.20s;">
-            <h2 class="h6 fw-bold text-uppercase mb-3">
-                <i class="bi bi-clipboard2-pulse-fill text-crimson me-2"></i>Assessment Sessions
-            </h2>
+        <div class="pro-card p-4 anim-rise" style="animation-delay: 0.20s;">
+            <h2 class="h6 fw-bold text-uppercase mb-3"><i class="bi bi-clipboard2-pulse-fill text-crimson me-2"></i>Assessment Sessions</h2>
             <div class="table-responsive">
-                <table class="table table-saas">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Assessment</th>
-                            <th>Status</th>
-                            <th>Started</th>
-                        </tr>
-                    </thead>
+                <table class="table table-pro">
+                    <thead><tr><th>ID</th><th>Assessment</th><th>Status</th><th>Started</th></tr></thead>
                     <tbody>
                         {% for a in assessments %}
                         <tr>
                             <td class="mono-text text-crimson fw-semibold">#{{ a.id }}</td>
                             <td class="fw-medium">{{ a.title }}</td>
-                            <td>
-                                <span class="badge rounded-pill {% if a.status == 'Active' %}bg-danger bg-opacity-25 text-danger border border-danger{% else %}bg-secondary bg-opacity-25 text-secondary{% endif %}">
-                                    {{ a.status }}
-                                </span>
-                            </td>
+                            <td><span class="badge rounded-pill {% if a.status == 'Active' %}bg-danger bg-opacity-25 text-danger border border-danger{% else %}bg-secondary bg-opacity-25 text-secondary{% endif %}">{{ a.status }}</span></td>
                             <td class="mono-text small text-secondary">{{ a.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
                         </tr>
                         {% else %}
-                        <tr>
-                            <td colspan="4" class="text-center text-secondary py-4">No assessments created yet.</td>
-                        </tr>
+                        <tr><td colspan="4" class="text-center text-secondary py-4">No assessments created yet.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
